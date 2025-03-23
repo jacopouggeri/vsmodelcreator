@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="macosx">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/natives/macosx" />
+    </CLASSES>
+    <JAVADOC />
+    <NATIVE>
+      <root url="file://$PROJECT_DIR$/natives/macosx" />
+    </NATIVE>
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/natives/macosx" recursive="false" />
+  </library>
+</component>

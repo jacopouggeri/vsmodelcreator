@@ -6,6 +6,7 @@ import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+
 import org.lwjgl.LWJGLUtil;
 import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
 
@@ -13,7 +14,7 @@ public class Start
 {
 	public static Color BorderColor = new Color(220, 220, 220);
 	public static javax.swing.border.Border Border = BorderFactory.createLineBorder(BorderColor, 0);
-	
+
 	public static void main(String[] args)
 	{
 		Double version = Double.parseDouble(System.getProperty("java.specification.version"));

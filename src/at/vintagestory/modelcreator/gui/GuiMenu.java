@@ -41,6 +41,7 @@ import at.vintagestory.modelcreator.util.screenshot.Uploader;
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.widgets.FileDialog;
+import org.lwjgl.LWJGLUtil;
 
 public class GuiMenu extends JMenuBar
 {
@@ -972,6 +973,22 @@ public class GuiMenu extends JMenuBar
 	public static String getFilePathFromFileOpenDialog(String dialogtitle, String filterPath, String filterName, String filterExt) {
 		String lastLoc = lastOpenLocations.get(filterName);
 		if (lastLoc != null) filterPath = lastLoc;
+
+		// For macOS we need to use Swing instead of SWT when not on the UI thread
+		if (LWJGLUtil.getPlatform() == LWJGLUtil.PLATFORM_MACOSX) {
+			JFileChooser chooser = new JFileChooser(filterPath);
+			chooser.setDialogTitle(dialogtitle);
+			chooser.setFileFilter(new FileNameExtensionFilter(filterName, filterExt.replace("*.", "")));
+
+			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+				String filePath = chooser.getSelectedFile().getAbsolutePath();
+				if (filePath != null) {
+					lastOpenLocations.put(filterName, chooser.getCurrentDirectory().getAbsolutePath());
+				}
+				return filePath;
+			}
+			return null;
+		}
 		
 		Display display = new Display ();
         Shell shell = new Shell (display);
