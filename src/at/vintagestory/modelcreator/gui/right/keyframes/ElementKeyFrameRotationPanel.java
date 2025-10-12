@@ -11,16 +11,11 @@ import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Start;

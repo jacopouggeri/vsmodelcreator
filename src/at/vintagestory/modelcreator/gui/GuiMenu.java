@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,19 +39,13 @@ import at.vintagestory.modelcreator.util.screenshot.PendingScreenshot;
 import at.vintagestory.modelcreator.util.screenshot.ScreenshotCallback;
 import at.vintagestory.modelcreator.util.screenshot.Uploader;
 
-import org.eclipse.swt.*;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.widgets.FileDialog;
-
 public class GuiMenu extends JMenuBar
 {
 	private static final long serialVersionUID = 1L;
 
 	private ModelCreator creator;
 
-	/* File */
-	private JMenu menuFile;
-	private JMenuItem itemNew;
+    private JMenuItem itemNew;
 	private JMenuItem itemLoad;
 	private JMenuItem itemTexturePath;
 	private JMenuItem itemShapePath;
@@ -63,19 +58,15 @@ public class GuiMenu extends JMenuBar
 	private JMenuItem itemExportUvMap;
 	private JMenuItem itemExit;
 
-	/* Edit */
-	private JMenu menuEdit;
-	private JMenuItem itemUndo;
+    private JMenuItem itemUndo;
 	private JMenuItem itemRedo;
 	private JMenuItem itemAddCube;
 	private JMenuItem itemAddFace;
 	
 	private JCheckBoxMenuItem itemRepositionWhenReparented;
-	
-	
-	/* Project */
-	private JMenu menuProject;
-	private JCheckBoxMenuItem itemUnlockAngles;
+
+
+    private JCheckBoxMenuItem itemUnlockAngles;
 	private JCheckBoxMenuItem itemSingleTexture;
 	private JMenuItem itemNoTextureSize;
 	private JMenuItem itemLoadAsBackdrop;
@@ -85,11 +76,9 @@ public class GuiMenu extends JMenuBar
 	
 	private JMenuItem itemLoadAsMountBackdrop;
 	private JMenuItem itemClearMountBackdrop;
-	
-	
-	/* View */
-	private JMenu menuView;
-	private JCheckBoxMenuItem itemGrid;
+
+
+    private JCheckBoxMenuItem itemGrid;
 	private JCheckBoxMenuItem itemTransparency;
 	private JCheckBoxMenuItem itemTexture;
 	private JCheckBoxMenuItem itemDarkMode;	
@@ -97,17 +86,13 @@ public class GuiMenu extends JMenuBar
 	private JCheckBoxMenuItem itemuvShowNames;
 	private JCheckBoxMenuItem itemShowShade;
 	private JMenuItem elementTreeHeight;
-	
-	private JMenuItem itemPreviewWind;
-	private JMenuItem itemPreviewWindOff;
+
+    private JMenuItem itemPreviewWindOff;
 	private JMenuItem itemPreviewWindSelected;
 	private JMenuItem itemPreviewWindAll;
-	
-	
 
-	/* Tools */
-	private JMenu menuTools;
-	private JMenuItem itemResize;
+
+    private JMenuItem itemResize;
 	
 	private JMenu itemRandomizeTexture;
 	private JMenuItem itemRandomizeTextureEle;
@@ -116,12 +101,9 @@ public class GuiMenu extends JMenuBar
 	
 	private JMenuItem itemclearTextures;
 	private JMenuItem itemGenSnowLayer;
-	private JMenuItem itemuvUnrwapEverything;
-	private JMenuItem itemReloadColorConfig;
-	private JMenuItem itemReduceDecimals;
-	
-	private JMenu itemAutoWind;
-	private JMenuItem itemAutoWindNormal;
+    private JMenuItem itemReduceDecimals;
+
+    private JMenuItem itemAutoWindNormal;
 	private JMenuItem itemAutoWindWeak;
 	private JMenuItem itemAutoWindBend;
 	private JMenuItem itemAutoWindTallBend;
@@ -136,20 +118,16 @@ public class GuiMenu extends JMenuBar
 	
 	private JMenuItem triCount;
 	private JMenuItem autoAnimCodes;
-	
 
-	/* Export */
-	private JMenu exportMenu;
-	private JMenuItem itemSaveScreenshot;
+
+    private JMenuItem itemSaveScreenshot;
 	public JMenuItem itemSaveGifAnimation;
 	public JMenuItem itemSavePngAnimation;
 	private JMenuItem itemReloadTextures;
 	private JCheckBoxMenuItem itemAutoReloadTextures;
 	private JMenuItem itemImgurLink;
-	
-	/* Help */
-	private JMenu helpMenu;
-	private JMenuItem itemControls;
+
+    private JMenuItem itemControls;
 	private JMenuItem itemCredits;
 
 	
@@ -161,7 +139,8 @@ public class GuiMenu extends JMenuBar
 
 	private void initMenu()
 	{
-		menuFile = new JMenu("File");
+        /* File */
+        JMenu menuFile = new JMenu("File");
 		{
 			itemNew = createItem("New", "New Model", KeyEvent.VK_N, new ImageIcon(getClass().getClassLoader().getResource("icons/new.png")));
 			itemLoad = createItem("Open...", "Open JSON", KeyEvent.VK_O, new ImageIcon(getClass().getClassLoader().getResource("icons/load.png")));
@@ -174,8 +153,9 @@ public class GuiMenu extends JMenuBar
 			colorPath = createItem("Set Color config path...", "Set the path for the color config", KeyEvent.VK_P, new ImageIcon(getClass().getClassLoader().getResource("icons/rainbow.png")));
 			itemExit = createItem("Exit", "Exit Application", KeyEvent.VK_Q, new ImageIcon(getClass().getClassLoader().getResource("icons/exit.png")));
 		}
-		
-		menuEdit = new JMenu("Edit");
+
+        /* Edit */
+        JMenu menuEdit = new JMenu("Edit");
 		{
 			itemUndo = createItem("Undo", "Undo the last action", 0, new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_undo.png")));
 			itemRedo = createItem("Redo", "Redo the last action", 0, new ImageIcon(getClass().getClassLoader().getResource("icons/arrow_redo.png")));
@@ -187,7 +167,8 @@ public class GuiMenu extends JMenuBar
 		}
 
 
-		menuProject = new JMenu("Project");
+        /* Project */
+        JMenu menuProject = new JMenu("Project");
 		{
 			itemAutoReloadTextures = createCheckboxItem("Autoreload changed textures", "Automatically reloads a texture if the file has been modified", 0, Icons.reload);
 			itemReloadTextures = createItem("Reload textures now", "Reloads textures now", KeyEvent.VK_F5, Icons.reload);
@@ -214,9 +195,11 @@ public class GuiMenu extends JMenuBar
 			itemClearMountBackdrop = createItem("Clear mount backdrop", "Remove the mount backdrop again", KeyEvent.VK_L, new ImageIcon(getClass().getClassLoader().getResource("icons/clear.png")));
 			itemClearMountBackdrop.setEnabled(false);
 		}
-		
-		menuView = new JMenu("View");
-		{
+
+        /* View */
+        JMenu menuView = new JMenu("View");
+        JMenuItem itemPreviewWind;
+        {
 			itemGrid = createCheckboxItem("Show Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
 			itemGrid.setSelected(ModelCreator.showGrid);
 			
@@ -247,11 +230,15 @@ public class GuiMenu extends JMenuBar
 				itemPreviewWindAll = createItem("All elements", null, KeyEvent.VK_B, Icons.wind);
 			}
 		}
-		
-		
 
-		menuTools = new JMenu("Tools");
-		{
+
+
+        /* Tools */
+        JMenu menuTools = new JMenu("Tools");
+        JMenu itemAutoWind;
+        JMenuItem itemReloadColorConfig;
+        JMenuItem itemuvUnrwapEverything;
+        {
 			itemResize = createItem("Resize Element", "Resize a cube, including child elements", KeyEvent.VK_R, Icons.inout);
 			
 			itemRandomizeTexture = new JMenu("Randomize Texture");
@@ -309,8 +296,9 @@ public class GuiMenu extends JMenuBar
 			autoAnimCodes = createItem("Autogenerate animation codes", "Takes all animation names, makes them lowercase, replaces spaces with dashes and sets the animation code to that value", 0, Icons.coin);
 		}
 
-		
-		exportMenu = new JMenu("Export");
+
+        /* Export */
+        JMenu exportMenu = new JMenu("Export");
 		{
 			itemSaveScreenshot = createItem("Save Screenshot to Disk...", "Save screenshot to disk.", KeyEvent.VK_F12, Icons.disk);
 			itemSaveGifAnimation= createItem("Export Current Animation as GIF...", "Export current Animation as GIF.", 0, Icons.disk);
@@ -319,8 +307,9 @@ public class GuiMenu extends JMenuBar
 			itemExportUvMap = createItem("Export UV Map...", "Lets you export a UV map when in single texture mode", KeyEvent.VK_U, new ImageIcon(getClass().getClassLoader().getResource("icons/texture.png")));
 		}
 
-		
-		helpMenu = new JMenu("Controls & Credits");
+
+        /* Help */
+        JMenu helpMenu = new JMenu("Controls & Credits");
 		{
 			itemControls = createItem("Controls", "Some useful controls", 0, Icons.keyboard);
 			itemCredits = createItem("Credits", "Who made this tool", 0, Icons.drink);
@@ -528,14 +517,14 @@ public class GuiMenu extends JMenuBar
 
 		
 				
-		ActionListener clistener = a -> { ModelCreator.currentProject.clearUnusedTextures(); }; 
+		ActionListener clistener = a -> ModelCreator.currentProject.clearUnusedTextures();
 		itemclearTextures.addActionListener(clistener);
 		
-		ActionListener glistener = a -> { ModelCreator.currentProject.TryGenSnowLayer(); }; 
+		ActionListener glistener = a -> ModelCreator.currentProject.TryGenSnowLayer();
 		itemGenSnowLayer.addActionListener(glistener);
 		
 		
-		ActionListener redulistener = a -> { ModelCreator.currentProject.ReduceDecimals(); }; 
+		ActionListener redulistener = a -> ModelCreator.currentProject.ReduceDecimals();
 		itemReduceDecimals.addActionListener(redulistener);
 
 
@@ -559,27 +548,27 @@ public class GuiMenu extends JMenuBar
 		
 		
 
-		ActionListener listener = a -> { OnNewModel(); }; 
+		ActionListener listener = a -> OnNewModel();
 		itemNew.addActionListener(listener);
 
 
-		listener = e -> { OnLoadFile(); };	
+		listener = e -> OnLoadFile();
 		itemLoad.addActionListener(listener);
 		
-		listener = e -> { OnImportFile(); };	
+		listener = e -> OnImportFile();
 		itemImport.addActionListener(listener);
 		
-		listener = e -> { OnLoadBackdropFile(); };	
+		listener = e -> OnLoadBackdropFile();
 		itemLoadAsBackdrop.addActionListener(listener);
 		
-		listener = e -> { OnClearBackdrop(); };	
+		listener = e -> OnClearBackdrop();
 		itemClearBackdrop.addActionListener(listener);
 		
 		
-		listener = e -> { OnLoadMountBackdropFile(); };	
+		listener = e -> OnLoadMountBackdropFile();
 		itemLoadAsMountBackdrop.addActionListener(listener);
 		
-		listener = e -> { OnClearMountBackdrop(); };	
+		listener = e -> OnClearMountBackdrop();
 		itemClearMountBackdrop.addActionListener(listener);
 
 		
@@ -595,7 +584,7 @@ public class GuiMenu extends JMenuBar
 		itemSave.addActionListener(listener);
 		
 
-		itemSaveAs.addActionListener(e -> { creator.SaveProjectAs(); });
+		itemSaveAs.addActionListener(e -> creator.SaveProjectAs());
 
 		
 		
@@ -679,14 +668,10 @@ public class GuiMenu extends JMenuBar
 		});
 		
 		itemExit.addActionListener(e ->
-		{
-			creator.close();
-		});
+                creator.close());
 		
 		
-		elementTreeHeight.addActionListener(a -> {
-			ElementTreeHeightDialog.show(creator);
-		});	
+		elementTreeHeight.addActionListener(a -> ElementTreeHeightDialog.show(creator));
 
 		itemGrid.addActionListener(a ->
 		{
@@ -695,9 +680,7 @@ public class GuiMenu extends JMenuBar
 		});
 		
 		itemTransparency.addActionListener(a ->
-		{
-			ModelCreator.transparent = itemTransparency.isSelected();
-		});
+                ModelCreator.transparent = itemTransparency.isSelected());
 
 		
 		
@@ -749,17 +732,11 @@ public class GuiMenu extends JMenuBar
 		});
 		
 		itemPreviewWindAll.addActionListener(a ->
-		{
-			ModelCreator.WindPreview = 2;
-		});
+                ModelCreator.WindPreview = 2);
 		itemPreviewWindOff.addActionListener(a ->
-		{
-			ModelCreator.WindPreview = 0;
-		});
+                ModelCreator.WindPreview = 0);
 		itemPreviewWindSelected.addActionListener(a ->
-		{
-			ModelCreator.WindPreview = 1;
-		});
+                ModelCreator.WindPreview = 1);
 		
 		
 		itemUnlockAngles.addActionListener(a ->
@@ -777,48 +754,28 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.updateValues(itemSingleTexture);
 		});
 		
-		itemNoTextureSize.addActionListener(a -> {
-			TextureSizeDialog.show(creator);
-		});
+		itemNoTextureSize.addActionListener(a -> TextureSizeDialog.show(creator));
 
-		itemResize.addActionListener(a -> {
-			ResizeDialog.show(creator);
-		});
+		itemResize.addActionListener(a -> ResizeDialog.show(creator));
 		
 		
 		
-		itemAutoWindNormal.addActionListener(a -> {
-			autoGuessWindMode(2);
-		});
+		itemAutoWindNormal.addActionListener(a -> autoGuessWindMode(2));
 		
-		itemAutoWindWeak.addActionListener(a -> {
-			autoGuessWindMode(1);
-		});
+		itemAutoWindWeak.addActionListener(a -> autoGuessWindMode(1));
 		
-		itemAutoWindBend.addActionListener(a -> {
-			autoGuessWindMode(4);
-		});
+		itemAutoWindBend.addActionListener(a -> autoGuessWindMode(4));
 		
-		itemAutoWindTallBend.addActionListener(a -> {
-			autoGuessWindMode(5);
-		});
+		itemAutoWindTallBend.addActionListener(a -> autoGuessWindMode(5));
 
 		
-		itemAutoWindExtraWeak.addActionListener(a -> {
-			autoGuessWindMode(7);
-		});
+		itemAutoWindExtraWeak.addActionListener(a -> autoGuessWindMode(7));
 		
-		itemAutoWindAllOff.addActionListener(a -> {
-			autoGuessWindMode(0);
-		});
+		itemAutoWindAllOff.addActionListener(a -> autoGuessWindMode(0));
 		
-		itemAutoWindWeakNoBend.addActionListener(a -> {
-			autoGuessWindMode(9);
-		});
+		itemAutoWindWeakNoBend.addActionListener(a -> autoGuessWindMode(9));
 		
-		itemAutoWindWeakBend.addActionListener(a -> {
-			autoGuessWindMode(-1);
-		});
+		itemAutoWindWeakBend.addActionListener(a -> autoGuessWindMode(-1));
 
 		
 		
@@ -855,9 +812,7 @@ public class GuiMenu extends JMenuBar
 		});
 
 		
-		itemReloadTextures.addActionListener(a -> {
-			ModelCreator.currentProject.reloadTextures(creator);
-		});
+		itemReloadTextures.addActionListener(a -> ModelCreator.currentProject.reloadTextures(creator));
 		
 		itemAutoReloadTextures.addActionListener(a -> {
 			ModelCreator.autoreloadTexture = itemAutoReloadTextures.isSelected();
@@ -866,9 +821,7 @@ public class GuiMenu extends JMenuBar
 		itemAutoReloadTextures.setSelected(ModelCreator.autoreloadTexture);
 
 		itemSaveScreenshot.addActionListener(a ->
-		{
-			saveScreenshot();
-		});
+                saveScreenshot());
 		
 		itemSaveGifAnimation.addActionListener(a -> {
 			JFileChooser chooser = new JFileChooser();
@@ -901,31 +854,21 @@ public class GuiMenu extends JMenuBar
 		
 		
 		itemImgurLink.addActionListener(a ->
-		{
-			CreateImgurLink();
-		});
+                CreateImgurLink());
 		
 		
 		itemControls.addActionListener(a ->
-		{
-			ControlsDialog.show(creator);
-		});
+                ControlsDialog.show(creator));
 		
 		itemCredits.addActionListener(a ->
-		{
-			CreditsDialog.show(creator);
-		});
+                CreditsDialog.show(creator));
 
 		
 		itemAddCube.addActionListener(a ->
-		{
-			ModelCreator.currentProject.addElementAsChild(new Element(1, 1, 1));
-		});
+                ModelCreator.currentProject.addElementAsChild(new Element(1, 1, 1)));
 		
 		itemAddFace.addActionListener(a ->
-		{
-			ModelCreator.currentProject.addElementAsChild(new Element(1, 1));
-		});	
+                ModelCreator.currentProject.addElementAsChild(new Element(1, 1)));
 		
 		triCount.addActionListener(a -> {
 			int tris = ModelCreator.currentProject.countTriangles();
@@ -968,43 +911,77 @@ public class GuiMenu extends JMenuBar
 	public static String getJsonFilePathFromFileOpenDialog(String dialogtitle) {
 		return getFilePathFromFileOpenDialog(dialogtitle, ModelCreator.prefs.get("filePath", "."), "JSON (.json)", "*.json");
 	}
-	
-	public static String getFilePathFromFileOpenDialog(String dialogtitle, String filterPath, String filterName, String filterExt) {
+
+	public static String getFilePathFromFileOpenDialog(
+			final String dialogTitle, String filterPath, final String filterName, final String filterExt) {
+
 		String lastLoc = lastOpenLocations.get(filterName);
-		if (lastLoc != null) filterPath = lastLoc;
-		
-		Display display = new Display ();
-        Shell shell = new Shell (display);
-		FileDialog dialog = new FileDialog (shell, SWT.OPEN);
-		String [] filterNames = new String [] {filterName};
-        String [] filterExtensions = new String [] {filterExt};
-        dialog.setText(dialogtitle);
-        dialog.setFilterNames (filterNames);
-        dialog.setFilterExtensions (filterExtensions);
-        dialog.setFilterPath (filterPath);
-        dialog.open();
-        
-        String result = null;
-        
-        String[] selectedFileNames = dialog.getFileNames();
-        String filePath = dialog.getFilterPath();
-        for(String fileName : selectedFileNames) {
-        	result = filePath + File.separator + fileName;
-			break;
-        }
-        shell.close();
-        while (!shell.isDisposed ()) {
-            if (!display.readAndDispatch ()) display.sleep ();
-        }
-        display.dispose();
-        
-        if (result != null) {
-        	lastOpenLocations.put(filterName, filePath);
-        }
-        
-        return result;
+		if (lastLoc != null && !lastLoc.isEmpty()) {
+			filterPath = lastLoc;
+		}
+		final String initialDir = filterPath; // capture once
+
+		if (SwingUtilities.isEventDispatchThread()) {
+			// We are already on EDT -> call directly
+			return doShowChooser(dialogTitle, initialDir, filterName, filterExt);
+		} else {
+			// Not on EDT -> block until chooser returns
+			final String[] out = new String[1];
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override public void run() {
+						out[0] = doShowChooser(dialogTitle, initialDir, filterName, filterExt);
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			return out[0];
+		}
 	}
-	
+
+	private static String doShowChooser(String dialogTitle, String initialDir, String filterName, String filterExt) {
+		JFileChooser fc = (initialDir != null && !initialDir.isEmpty())
+				? new JFileChooser(new File(initialDir))
+				: new JFileChooser();
+
+		fc.setDialogTitle((dialogTitle != null && !dialogTitle.isEmpty()) ? dialogTitle : "Open File");
+		fc.setMultiSelectionEnabled(false);
+		fc.setAcceptAllFileFilterUsed(true);
+
+		List<String> exts = parseExtensions(filterExt);
+		if (!exts.isEmpty()) {
+			String label = (filterName != null && !filterName.isEmpty())
+					? filterName
+					: (exts.size() == 1 ? (exts.get(0).toUpperCase() + " files") : "Filtered files");
+			fc.setFileFilter(new FileNameExtensionFilter(label, exts.toArray(new String[exts.size()])));
+		}
+
+		int res = fc.showOpenDialog(null);
+		if (res != JFileChooser.APPROVE_OPTION || fc.getSelectedFile() == null) return null;
+
+		File chosen = fc.getSelectedFile();
+		File parent = chosen.getParentFile();
+		if (parent != null) lastOpenLocations.put(filterName, parent.getAbsolutePath());
+		return chosen.getAbsolutePath();
+	}
+
+	private static List<String> parseExtensions(String filterExt) {
+		List<String> exts = new ArrayList<String>();
+		if (filterExt == null) return exts;
+		String s = filterExt.trim();
+		if (s.isEmpty()) return exts;
+		String[] parts = s.split("[,;\\s]+");
+		for (String p : parts) {
+			String t = p.trim();
+			if (t.startsWith("*.")) t = t.substring(2);
+			else if (t.startsWith(".")) t = t.substring(1);
+			else if (t.startsWith("*")) t = t.substring(1);
+			if (!t.isEmpty() && !t.equals("*")) exts.add(t.toLowerCase());
+		}
+		return exts;
+	}
 
 	private void OnLoadFile()
 	{

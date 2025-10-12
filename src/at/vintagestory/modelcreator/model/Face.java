@@ -5,12 +5,15 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Random;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Sphere;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
@@ -227,20 +230,14 @@ public class Face
             double sizeU = textureUEnd - textureU;
             double sizeV = textureVEnd - textureV;
             
-            sizeXyz.Set(
-                (float)(cuboid.width) / 1f,
-                (float)(cuboid.height) / 1f,
-                (float)(cuboid.depth) / 1f
-            );
+            sizeXyz.Set((float) (cuboid.width), (float) (cuboid.height), (float) (cuboid.depth));
             
             // Relative center, because transformation matrix already translated to the from position
             
             centerVec.Set(sizeXyz.X / 2, sizeXyz.Y / 2, sizeXyz.Z / 2);
-            
-            
+
             int[] tris = new int[] { 0, 1, 2, 0, 2, 3};
 
-            
 			GL11.glBegin(GL11.GL_TRIANGLES);
 			{
 				for (int j = 0; j < tris.length; j++) {
@@ -288,9 +285,6 @@ public class Face
 					
 					float[] invmat = Mat4f.Invert(new float[16], matrix);
 					float[] out = Mat4f.MulWithVec4(invmat, new float[] { (float)offX, 0, 0, 0, 1 });
-					
-					
-					
 
 					GL11.glTexCoord2d(uv.W, uv.H);
 					
@@ -302,17 +296,13 @@ public class Face
 				}
 			}
 			GL11.glEnd();
-			
-			
 			GL11.glDisable(GL_TEXTURE_2D);
 			
 			if (ProjectType.equals("normal")) GL11.glLoadName(0);
-
 		}
 		GL11.glPopMatrix();
 	}
-	
-	
+
 	public Sized translateVoxelPosToUvPos(double voxelU, double voxelV, boolean actualPosition) {
 		Project project = getProject();
 		return translateVoxelPosToUvPos(project, project == null ? null : project.getTextureEntryByCode(textureCode), voxelU, voxelV, actualPosition);
@@ -383,23 +373,17 @@ public class Face
 	public static boolean bindTexture(TextureEntry entry)
 	{
 		TextureImpl.bindNone();
-		
-		if (entry != null && ModelCreator.renderTexture)
-		{
-			if (entry != null)
-			{
-				if (entry.getTexture() != null)
-				{
-					GL11.glColor3f(1.0F, 1.0F, 1.0F);
-					entry.getTexture().bind();
-				}
 
-				return true;
-			}
-		}
-		
-		return false;
-	}
+        if (entry == null || !ModelCreator.renderTexture) {
+            return false;
+        }
+        if (entry.getTexture() != null)
+        {
+            GL11.glColor3f(1.0F, 1.0F, 1.0F);
+            entry.getTexture().bind();
+        }
+        return true;
+    }
 	
 
 	public void moveTextureU(double amt)
@@ -420,7 +404,7 @@ public class Face
 		if (amt != 0) ModelCreator.DidModify();
 	}
 
-	public void addTextureU(double amt)
+	public void addTexndtureU(double amt)
 	{
 		this.textureU += amt;
 		cuboid.updateUV();
@@ -794,9 +778,9 @@ public class Face
 		}
 		
 		Vec3f sizeXyz = new Vec3f(
-            (float)(cuboid.getWidth()) / 1f,
-            (float)(cuboid.getHeight()) / 1f,
-            (float)(cuboid.getDepth()) / 1f
+                (float) (cuboid.getWidth()),
+                (float) (cuboid.getHeight()),
+                (float) (cuboid.getDepth())
         );
 		Vec3f centerVec = new Vec3f(sizeXyz.X / 2, sizeXyz.Y / 2, sizeXyz.Z / 2);
 		

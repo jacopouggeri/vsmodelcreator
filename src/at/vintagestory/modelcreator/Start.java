@@ -2,12 +2,10 @@ package at.vintagestory.modelcreator;
 
 import java.awt.Color;
 import java.io.File;
-import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import org.lwjgl.LWJGLUtil;
-import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
 
 public class Start
 {
@@ -16,7 +14,7 @@ public class Start
 	
 	public static void main(String[] args)
 	{
-		Double version = Double.parseDouble(System.getProperty("java.specification.version"));
+		double version = Double.parseDouble(System.getProperty("java.specification.version"));
 		if (version < 1.8)
 		{
 			JOptionPane.showMessageDialog(null, "You need Java 1.8 or higher to run this program.");
@@ -47,28 +45,22 @@ public class Start
 		    break;
 		}
 
-		System.setProperty("org.lwjgl.librarypath", JGLLib.getAbsolutePath());
-		
+		if (JGLLib != null) {
+			System.setProperty("org.lwjgl.librarypath", JGLLib.getAbsolutePath());
+		}
+		else {
+			JOptionPane.showMessageDialog(null, "Critical error: Could not set LWJGL library path");
+			return;
+		}
+
 		try
 		{
-			Properties props = new Properties();
-			props.put("logoString", "HiFi");
-			props.put("centerWindowTitle", "on");
-			/*props.put("buttonBackgroundColor", "127 132 145");
-			props.put("buttonForegroundColor", "255 255 255");
-			props.put("windowTitleBackgroundColor", "97 102 115");
-			props.put("windowTitleForegroundColor", "255 255 255");
-			props.put("backgroundColor", "221 221 228");
-			props.put("menuBackgroundColor", "221 221 228");
-			props.put("controlForegroundColor", "120 120 120");
-			props.put("windowBorderColor", "97 102 110");*/
-			HiFiLookAndFeel.setTheme(props);
-			UIManager.setLookAndFeel("com.jtattoo.plaf.hifi.HiFiLookAndFeel");
+			UIManager.setLookAndFeel(new com.formdev.flatlaf.themes.FlatMacDarkLaf());
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e);
+			e.printStackTrace();
 		}
 
 		try {
