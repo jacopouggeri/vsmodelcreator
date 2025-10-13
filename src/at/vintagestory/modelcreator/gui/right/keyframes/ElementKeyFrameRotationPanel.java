@@ -139,11 +139,7 @@ public class ElementKeyFrameRotationPanel extends JPanel implements IValueUpdate
 			}
 		});
 
-		
-		
 		sliderPanel.add(rotationFields[num]);
-		
-		
 		rotationSliders[num] = new JSlider(JSlider.HORIZONTAL, ROTATION_MIN, ROTATION_MAX, ROTATION_INIT);
 		rotationSliders[num].setMajorTickSpacing(1);
 		rotationSliders[num].setPaintTicks(true);

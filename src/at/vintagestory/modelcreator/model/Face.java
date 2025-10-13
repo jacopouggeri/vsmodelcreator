@@ -3,25 +3,20 @@ package at.vintagestory.modelcreator.model;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL33.GL_TEXTURE_SWIZZLE_RGBA;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.Random;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.glu.Sphere;
+import org.lwjgl.opengl.*;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureImpl;
 import at.vintagestory.modelcreator.ModelCreator;
 import at.vintagestory.modelcreator.Project;
 import at.vintagestory.modelcreator.enums.BlockFacing;
-import at.vintagestory.modelcreator.util.GameMath;
 import at.vintagestory.modelcreator.util.Mat4f;
 import at.vintagestory.modelcreator.util.Vec3f;
 
@@ -31,7 +26,6 @@ public class Face
 
 	static Random rand = new Random();
 
-	
 	// NS = Z
 	// WE = X
 	// UD = Y
@@ -142,8 +136,6 @@ public class Face
             1, 1
 	};
 
-	
-	
 	private String textureCode = null;
 	public double textureU = 0;
 	public double textureV = 0;
@@ -219,7 +211,6 @@ public class Face
 			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL13.GL_CLAMP_TO_BORDER);
 			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL13.GL_CLAMP_TO_BORDER);
 			GL11.glTexParameter(GL_TEXTURE_2D, GL11.GL_TEXTURE_BORDER_COLOR, color);
-			
 			bindTexture();
 
 			if (textureBound) GL11.glColor3f(brightness, brightness, brightness);
@@ -327,7 +318,6 @@ public class Face
 		
 		return new Sized(voxelU / textureVoxelWidth, voxelV / textureVoxelHeight);
 	}
-	
 	
 	public Sized getVoxel2PixelScale() {
 		Project project = getProject();

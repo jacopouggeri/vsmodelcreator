@@ -1,11 +1,14 @@
 package at.vintagestory.modelcreator;
 
-import java.awt.Image;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 
@@ -18,6 +21,7 @@ import at.vintagestory.modelcreator.gui.right.RightPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.*;
+import org.newdawn.slick.util.BufferedImageUtil;
 
 public class Project
 {
@@ -614,8 +618,7 @@ public class Project
 			} catch (Exception e) {}
 		}
 	}
-	
-	
+
 	public void reloadExternalTexture(TextureEntry entry) throws IOException {
 		FileInputStream is = new FileInputStream(entry.getFilePath());
 		Texture texture = TextureLoader.getTexture("PNG", is);
@@ -630,28 +633,30 @@ public class Project
 		entry.icon = upscaleIcon(new ImageIcon(entry.getFilePath()), 256);
 		entry.texture = texture;
 	}
-	
 
 	public String loadTexture(String textureCode, File image, BooleanParam isNew, String projectType, boolean doReplaceAll, boolean doReplacedForSelectedElement, boolean insertTextureSizeEntry) throws IOException
 	{
-		FileInputStream is = new FileInputStream(image);
+		BufferedImage bi;
 		Texture texture;
 		try {
-			texture = TextureLoader.getTexture("PNG", is);
+			bi = ImageIO.read(image);               // Java ARGB
+			BufferedImage bgr = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			Graphics2D g = bgr.createGraphics();
+			g.drawImage(bi, 0, 0, null);
+			g.dispose();
+			String name = (textureCode != null ? textureCode : image.getName());
+			texture = BufferedImageUtil.getTexture(name, bgr);
 		} catch (Throwable e) {
-			return "Unabled to load this texture, is this a valid png file?";
+			return "Unable to load this texture, is this a valid PNG file?";
 		}
-		
 		texture.setTextureFilter(SGL.GL_NEAREST);
-		is.close();
 
 		if (texture.getImageHeight() % 8 != 0 || texture.getImageWidth() % 8 != 0)
 		{
 			texture.release();
 			return "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
 		}
-				
-		
+
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
 		
 		if (textureCode == null) {
@@ -737,24 +742,6 @@ public class Project
 		
 		return null;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 	public ImageIcon upscaleIcon(ImageIcon source, int length)
 	{
@@ -762,9 +749,6 @@ public class Project
 		Image newimg = img.getScaledInstance(length, -1, java.awt.Image.SCALE_FAST);
 		return new ImageIcon(newimg);
 	}
-
-
-
 
 	public void setProjectType(String type)
 	{
@@ -789,7 +773,6 @@ public class Project
 			elem.reloadStepparentRelationShip();
 		}
 	}
-	
 
 	public void ReduceDecimals() {
 		ModelCreator.changeHistory.beginMultichangeHistoryState();
@@ -802,7 +785,6 @@ public class Project
 		ModelCreator.updateValues(null);
 		ModelCreator.changeHistory.endMultichangeHistoryState(this);
 	}
-	
 
 	public void TryGenSnowLayer()
 	{
@@ -815,8 +797,7 @@ public class Project
 		if (!TexturesByCode.containsKey("snowcover")) {
 			loadSnowTexture();
 		}
-		
-		
+
 		ModelCreator.DidModify();
 		ModelCreator.updateValues(null);
 
@@ -832,8 +813,6 @@ public class Project
 		
 		ModelCreator.changeHistory.endMultichangeHistoryState(this);
 	}
-
-	
 
 	private void TryGenSnowLayer(Element elem)
 	{
@@ -900,10 +879,8 @@ public class Project
 		for (Element elem : rootElements) {
 			cnt += elem.countTriangles();
 		}
-		
 		return cnt;
 	}
-
 
 	public void attachToBackdropProject(Project backDropProject)
 	{
@@ -913,7 +890,6 @@ public class Project
 			anim.loadKeyFramesIntoProject(backDropProject);
 		}
 	}
-
 
 	private void insertStepChildren(ArrayList<Element> myElements, Project backDropProject)
 	{
@@ -926,7 +902,6 @@ public class Project
 		}
 	}
 
-
 	private void insertStepChild(Element myElem, Project backDropProject)
 	{
 		Element hisElem = backDropProject.findElement(myElem.stepparentName);
@@ -937,7 +912,6 @@ public class Project
 			}
 		}
 	}
-
 
 	public void EnsureAnimationSelected(Animation templateAnim)
 	{
@@ -952,7 +926,6 @@ public class Project
 		}
 	}
 
-
 	public void clearUnusedTextures()
 	{
 		HashSet<String> usedCodes = new HashSet<String>();
@@ -961,7 +934,7 @@ public class Project
 			elem.CollectTextureCodes(usedCodes);
 		}
 		
-		boolean modified=false;
+		boolean modified = false;
 		
 		for (String texCode : new HashSet<String>(TexturesByCode.keySet())) {
 			if (!usedCodes.contains(texCode)) { TexturesByCode.remove(texCode); if (!modified) ModelCreator.changeHistory.beginMultichangeHistoryState(); modified = true; }
@@ -976,5 +949,4 @@ public class Project
 		}
 		
 	}
-
 }

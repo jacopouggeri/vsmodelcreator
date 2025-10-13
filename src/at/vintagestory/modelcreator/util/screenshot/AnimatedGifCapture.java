@@ -73,8 +73,6 @@ public class AnimatedGifCapture extends AnimationCapture
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
 	}
 
 }

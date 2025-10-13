@@ -174,16 +174,16 @@ public class GuiMenu extends JMenuBar
 			itemReloadTextures = createItem("Reload textures now", "Reloads textures now", KeyEvent.VK_F5, Icons.reload);
 			
 
-			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, Icons.transparent);
+			itemUnlockAngles = createCheckboxItem("Unlock all Angles", "Disabling this allows angle stepping of single degrees. Suggested to unlock this only for entities.", KeyEvent.VK_A, null);
 			itemUnlockAngles.setSelected(ModelCreator.currentProject.AllAngles);
 			
-			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, Icons.transparent);
-			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, Icons.transparent);
+			itemSingleTexture = createCheckboxItem("Entity Texturing Mode", "When creating entities, it is often more useful to use only a single texture and have the uv boxes unwrap side by side.", 0, null);
+			itemNoTextureSize = createItem("Texture Size...", "The size of the textured previewed in the UV Pane when no texture is loaded", 0, null);
 			
-			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D,Icons.transparent);
+			itemSaratyMode = createCheckboxItem("Saraty Mode", "When enabled, changes the auto-uv-unwrap feature to be more Saraty-compatible", KeyEvent.VK_D, null);
 			itemSaratyMode.setSelected(ModelCreator.saratyMode);
 			
-			itemSaveDisabledFaces = createCheckboxItem("Save disabled faces", "Whether disabled faces also get saved to file.", 0, Icons.transparent);
+			itemSaveDisabledFaces = createCheckboxItem("Save disabled faces", "Whether disabled faces also get saved to file.", 0, null);
 			itemSaveDisabledFaces.setSelected(ModelCreator.saveDisabledFaces);
 
 			itemLoadAsBackdrop = createItem("Set backdrop...", "Set a model as a backdrop", KeyEvent.VK_K, new ImageIcon(getClass().getClassLoader().getResource("icons/import.png")));
@@ -200,22 +200,22 @@ public class GuiMenu extends JMenuBar
         JMenu menuView = new JMenu("View");
         JMenuItem itemPreviewWind;
         {
-			itemGrid = createCheckboxItem("Show Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, Icons.transparent);
+			itemGrid = createCheckboxItem("Show Grid + Compass", "Toggles the voxel grid and compass overlay", KeyEvent.VK_G, null);
 			itemGrid.setSelected(ModelCreator.showGrid);
 			
-			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D,Icons.transparent);
+			itemuvShowNames = createCheckboxItem("Show element names in UV editor", "When enabled, will display the name of the element in the UV editor", KeyEvent.VK_D, null);
 			itemuvShowNames.setSelected(ModelCreator.uvShowNames);
 			
-			itemShowShade = createCheckboxItem("Show element shade", "When disabled, element shade is disabled", KeyEvent.VK_D,Icons.transparent);
+			itemShowShade = createCheckboxItem("Show element shade", "When disabled, element shade is disabled", KeyEvent.VK_D, null);
 			itemShowShade.setSelected(ModelCreator.showShade);
 
-			itemTexture = createCheckboxItem("Render Textures", "Toggles textured rendering", KeyEvent.VK_T, Icons.transparent);
+			itemTexture = createCheckboxItem("Render Textures", "Toggles textured rendering", KeyEvent.VK_T, null);
 			itemTexture.setSelected(ModelCreator.transparent);
 
-			itemTransparency = createCheckboxItem("Render Texture Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, Icons.transparent);
+			itemTransparency = createCheckboxItem("Render Texture Transparency", "Toggles transparent rendering", KeyEvent.VK_Y, null);
 			itemTransparency.setSelected(ModelCreator.transparent);
 			
-			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D,Icons.transparent);
+			itemDarkMode = createCheckboxItem("Dark Mode", "Turn on Darkmode", KeyEvent.VK_D, null);
 			itemDarkMode.setSelected(ModelCreator.darkMode);
 			
 			elementTreeHeight = createItem("Element tree height...", "The height of the element tree on the right hand side", 0, null);
@@ -696,7 +696,6 @@ public class GuiMenu extends JMenuBar
 		key = "Show Textxure";
 		itemTexture.setAction(buttonAction3);
 		buttonAction3.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
-		itemTexture.setIcon(new ImageIcon(getClass().getClassLoader().getResource("icons/transparent.png")));
 		itemTexture.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(strokes[6], key);
 		itemTexture.getActionMap().put(key, buttonAction3);
 		itemTexture.setAccelerator(strokes[6]);
@@ -1053,13 +1052,9 @@ public class GuiMenu extends JMenuBar
 		JCheckBoxMenuItem item = new JCheckBoxMenuItem(name);
 		item.setToolTipText(tooltip);
 		item.setMnemonic(mnemonic);
-		item.setIcon(icon);
+		if (icon != null) item.setIcon(icon);
 		return item;
 	}
-	
-	
-	
-
 
 	private void saveScreenshot()
 	{

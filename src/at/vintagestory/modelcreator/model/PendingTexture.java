@@ -29,7 +29,6 @@ public class PendingTexture
 		this(textureName, texture, (ITextureCallback) null, loadDelay);
 	}
 
-	
 	public PendingTexture(String textureName, File texture, ITextureCallback callback, int loadDelay)
 	{
 		this.textureFile = texture;
