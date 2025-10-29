@@ -176,7 +176,6 @@ public class Face
 		this.cuboid = cuboid;
 		this.side = side;
 	}
-	
 
 	static FloatBuffer color = BufferUtils.createFloatBuffer(4);
 	static {
@@ -194,8 +193,7 @@ public class Face
     
     public Vec3f sizeXyz = new Vec3f();
 	public Vec3f centerVec = new Vec3f();
-	
-    
+
 	public void renderFace(BlockFacing blockFacing, float brightness, boolean windAnimate, float[] matrix)
 	{	
 		Project project = getProject();
@@ -210,7 +208,11 @@ public class Face
 			GL11.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL13.GL_CLAMP_TO_BORDER);
 			GL11.glTexParameteri(GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL13.GL_CLAMP_TO_BORDER);
-			GL11.glTexParameter(GL_TEXTURE_2D, GL11.GL_TEXTURE_BORDER_COLOR, color);
+			FloatBuffer newColor = BufferUtils.createFloatBuffer(4);
+			newColor.rewind();
+			newColor.put(new float[] {1,1,0,1});
+			newColor.rewind();
+			GL11.glTexParameter(GL_TEXTURE_2D, GL11.GL_TEXTURE_BORDER_COLOR, newColor);
 			bindTexture();
 
 			if (textureBound) GL11.glColor3f(brightness, brightness, brightness);
@@ -340,11 +342,8 @@ public class Face
 				(double)entry.Height / textureVoxelHeight
 			);
 		}
-		
 		return new Sized(ModelCreator.noTexScale, ModelCreator.noTexScale); 
 	}
-	
-	
 
 	public void setTextureCode(String textureCode)
 	{
@@ -359,22 +358,60 @@ public class Face
 			textureBound = bindTexture(entry);
 		}
 	}
-	
-	public static boolean bindTexture(TextureEntry entry)
-	{
-		TextureImpl.bindNone();
 
-        if (entry == null || !ModelCreator.renderTexture) {
-            return false;
-        }
-        if (entry.getTexture() != null)
-        {
-            GL11.glColor3f(1.0F, 1.0F, 1.0F);
-            entry.getTexture().bind();
-        }
-        return true;
-    }
-	
+	private static int DEBUG_TEX_ID = 0;
+	private static final boolean USE_DEBUG_TEX = false;
+
+	private static int makeDebugTex2x2() {
+		java.nio.ByteBuffer buf = BufferUtils.createByteBuffer(2 * 2 * 4);
+		// RGBA texels: [R,G] on top row, [B,W] bottom row
+		buf.put((byte)255).put((byte)0).put((byte)0).put((byte)255);
+		buf.put((byte)0).put((byte)255).put((byte)0).put((byte)255);
+		buf.put((byte)0).put((byte)0).put((byte)255).put((byte)255);
+		buf.put((byte)255).put((byte)255).put((byte)255).put((byte)255);
+		buf.flip();
+
+		int id = GL11.glGenTextures();
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+		GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8,
+				2, 2, 0,
+				org.lwjgl.opengl.GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buf);
+		// sanity: confirm it actually uploaded
+		int w = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
+		int h = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
+		System.out.println("DEBUG TEX id=" + id + " size=" + w + "x" + h + " glErr=" + GL11.glGetError());
+		return id;
+	}
+
+	public static boolean bindTexture(TextureEntry entry) {
+		TextureImpl.bindNone(); // binds 0
+		if (!ModelCreator.renderTexture) return false;
+
+		// --- DEBUG INJECTION ---
+		if (USE_DEBUG_TEX) {
+			if (DEBUG_TEX_ID == 0) DEBUG_TEX_ID = makeDebugTex2x2();
+
+			// make sure we sample from unit 0 and texturing is enabled
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			GL11.glDisable(GL11.GL_LIGHTING); // avoid fixed-function lighting washing it out
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL11.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_REPLACE);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, DEBUG_TEX_ID);
+			return true;
+		}
+		// --- END DEBUG ---
+
+		if (entry == null || entry.getTexture() == null) return false;
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		entry.getTexture().bind();
+		return true;
+	}
 
 	public void moveTextureU(double amt)
 	{

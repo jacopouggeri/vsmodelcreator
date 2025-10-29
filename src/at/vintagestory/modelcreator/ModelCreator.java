@@ -23,20 +23,14 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import at.vintagestory.modelcreator.gui.right.ElementTreeCellRenderer;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.lwjgl.LWJGLException;
@@ -120,9 +114,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	List<PendingTexture> pendingTextures = Collections.synchronizedList(new ArrayList<PendingTexture>());
 	private PendingScreenshot screenshot = null;
 	public static AnimationCapture animCapture = null;
-	
-	
-	
 
 	private int lastMouseX, lastMouseY;
 	boolean mouseDownOnLeftPanel;
@@ -131,9 +122,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	
 	private boolean grabbing = false;
 	private boolean closeRequested = false;
-	
 
-	
 	public LeftSidebar uvSidebar;
 	public static GuiMenu guiMain;
 	public static LeftKeyFramesPanel leftKeyframesPanel;
@@ -143,8 +132,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	public ModelRenderer modelrenderer;
 	
 	public long prevFrameMillisec;
-	
-	
+
 	public static double WindWaveCounter;
 	public static int WindPreview;
 	
@@ -191,8 +179,9 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		setLayout(new BorderLayout(10, 0));
 		setIconImages(getIcons());
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setDarkMode(darkMode);
 
-		String loadFile = null;
+        String loadFile = null;
 		for (int i = 0; i < args.length; i++) {
 			if (Objects.equals(args[i], "-t") && args.length > i + 1) {
 				ModelCreator.prefs.put("texturePath", args[i + 1]);
@@ -212,7 +201,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 
 		initComponents();
-		
 
 		addWindowListener(new WindowAdapter()
 		{
@@ -338,7 +326,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 	    }
 	    return sb.toString();
 	}
-	
 
 	public static void DidModify() {
 		if (ignoreDidModify > 0) return;
@@ -425,8 +412,6 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		return icons;
 	}
 
-	
-	
 	public static void updateValues(JComponent byGuiElem)
 	{
 		if (currentProject == null) return;
@@ -446,7 +431,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				}
 				
 				guiMain.updateValues(byGuiElem);
-			 	((RightPanel)rightTopPanel).updateValues(byGuiElem);
+			 	rightTopPanel.updateValues(byGuiElem);
 			 	leftKeyframesPanel.updateValues(byGuiElem);
 			 	updateFrame(false);
 			 	updateTitle();
@@ -484,7 +469,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 					ignoreFrameUpdates = true;
 					
 					leftKeyframesPanel.updateFrame();
-					((RightPanel)rightTopPanel).updateFrame(null);
+					rightTopPanel.updateFrame(null);
 					updateTitle();
 					guiMain.updateFrame();
 					
@@ -495,7 +480,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			ignoreFrameUpdates = true;
 			
 			leftKeyframesPanel.updateFrame();
-			((RightPanel)rightTopPanel).updateFrame(null);
+			rightTopPanel.updateFrame(null);
 			updateTitle();
 			guiMain.updateFrame();
 			
@@ -559,8 +544,7 @@ public class ModelCreator extends JFrame implements ITextureCallback
 				pendingTextures.addAll(notLoadedPendingTexs);
 				notLoadedPendingTexs.clear();
 			}
-			
-			
+
 			if (project.SelectedAnimation != null && project.SelectedAnimation.framesDirty) {
 				project.SelectedAnimation.calculateAllFrames(project);
 			}
@@ -598,13 +582,11 @@ public class ModelCreator extends JFrame implements ITextureCallback
 			
 			handleInputKeyboard();
 			handleInputMouse(leftSidebarWidth);
-			
-			
+
 			if (animCapture != null && !animCapture.isComplete()) {
 				animCapture.PrepareFrame();
 			}
-			
-			
+
 			if (ModelCreator.transparent) {
 				GL11.glEnable(GL11.GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1468,8 +1450,24 @@ public class ModelCreator extends JFrame implements ITextureCallback
 		}
 		
 		ModelCreator.currentProject.reloadStepparentRelationShips();
-		
 	}
 
-	
+	public static void setDarkMode(boolean darkMode) {
+		SwingUtilities.invokeLater(() -> {
+			try {
+				UIManager.setLookAndFeel(darkMode ? new FlatMacDarkLaf()
+						: new FlatMacLightLaf());
+				// Updates ALL open windows/components
+				FlatLaf.updateUI();
+				// re-pack frames to re-calc sizes if fonts/metrics changed
+				for (java.awt.Window w : java.awt.Window.getWindows()) {
+					SwingUtilities.updateComponentTreeUI(w);
+					if (w instanceof JFrame) w.pack();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Theme switch failed:\n" + e.getMessage());
+			}
+		});
+	}
 }

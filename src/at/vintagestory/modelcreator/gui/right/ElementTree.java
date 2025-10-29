@@ -105,22 +105,17 @@ public class ElementTree
 					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)jtree.getLastSelectedPathComponent();
 					jtree.expandPath(new TreePath(selectedNode.getPath()));
 				}
-				
 			}
 			
 			@Override
 			public void keyReleased(KeyEvent e)
 			{
 				// TODO Auto-generated method stub
-				
 			}
 			
 			@Override
 			public void keyPressed(KeyEvent e)
 			{
-				
-				
-				
 			}
 		});
 		
@@ -133,7 +128,6 @@ public class ElementTree
 				if (ignoreExpandCollapse) return;
 				TreePath path = arg0.getPath();
 				collapsedPaths.remove(path.toString().substring(1).replace("]", "").replace(", ", "/"));
-				
 				ModelCreator.currentProject.collapsedPaths = saveCollapsedPaths();
 			}
 			

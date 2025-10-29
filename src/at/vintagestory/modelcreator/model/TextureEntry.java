@@ -90,7 +90,6 @@ public class TextureEntry
 		return texture;
 	}
 
-
 	public ImageIcon getIcon()
 	{
 		return icon;

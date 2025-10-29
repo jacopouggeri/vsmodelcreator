@@ -261,7 +261,6 @@ public class Importer
 			}
 		}
 	}
-	
 
 	private void loadTexture(File dir, String textureName, String textureSubPath, String projectType)
 	{
@@ -275,7 +274,6 @@ public class Importer
 			return;
 		}
 
-		
 		String textureBasePath = ModelCreator.prefs.get("texturePath", ".");
 		File f = new File(textureBasePath + File.separator + textureSubPath + ".png");
 		
@@ -289,7 +287,6 @@ public class Importer
 		
 		project.MissingTexturesByCode.put(textureName, textureSubPath);
 	}
-	
 
 	private Animation readAnimation(JsonObject obj)
 	{

@@ -55,7 +55,7 @@ public class Start
 
 		try
 		{
-			UIManager.setLookAndFeel(new com.formdev.flatlaf.themes.FlatMacDarkLaf());
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		}
 		catch (Exception e)
 		{

@@ -71,7 +71,6 @@ public class TextureDialog implements ITextureCallback
 		scroll.getVerticalScrollBar().setVisible(false);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-		
 		JPanel textFieldAndButtons = new JPanel(new GridLayout(2,1));
 
 		JPanel textFieldRow = new JPanel(new GridLayout(1,1));
@@ -115,11 +114,7 @@ public class TextureDialog implements ITextureCallback
 		
 		JPanel buttonRow = new JPanel(new GridLayout(1, 3));
 		buttonRow.setPreferredSize(new Dimension(1000, 30));
-		
-		
-		
-		
-		
+
 		JButton btnSelect = new JButton("Apply");
 		btnSelect.addActionListener(a ->
 		{

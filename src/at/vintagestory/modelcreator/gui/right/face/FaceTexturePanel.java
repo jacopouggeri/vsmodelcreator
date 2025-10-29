@@ -36,14 +36,14 @@ public class FaceTexturePanel extends JPanel implements ITextureCallback
 		this.manager = manager;
 		setLayout(new GridLayout(2, 2, 4, 4));
 		setBorder(BorderFactory.createTitledBorder(Start.Border, "<html><b>Texture</b></html>"));
-		setMaximumSize(new Dimension(186, 90));
+		setMaximumSize(new Dimension(250, 90));
 		initComponents();
 		addComponents();
 	}
 
 	public void initComponents()
 	{
-		Font defaultFont = new Font("SansSerif", Font.BOLD, 14);
+		Font defaultFont = new Font("SansSerif", Font.BOLD, 12);
 
 		btnSelect = new JButton("Image");
 		btnSelect.setIcon(Icons.texture);

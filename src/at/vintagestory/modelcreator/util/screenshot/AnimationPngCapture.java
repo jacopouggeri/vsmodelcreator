@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 
 import at.vintagestory.modelcreator.ModelCreator;
+import org.lwjgl.opengl.GL12;
 
 public class AnimationPngCapture extends AnimationCapture
 {
@@ -19,7 +20,6 @@ public class AnimationPngCapture extends AnimationCapture
 	
 	public AnimationPngCapture(String filename) {
 		this.filename = filename;
-		
 		if (!filename.endsWith(".png")) filename += ".png";
 	}
 	
@@ -38,25 +38,12 @@ public class AnimationPngCapture extends AnimationCapture
 		GL11.glReadBuffer(GL11.GL_FRONT);
 		int bpp = 4;
 		ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp);
-		GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+		GL11.glReadPixels(0, 0, width, height, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, buffer);
 
 		try
 		{
-			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			
-			for (int x = 0; x < width; x++)
-			{
-				for (int y = 0; y < height; y++)
-				{
-					int i = (x + (width * y)) * bpp;
-					int r = buffer.get(i) & 0xFF;
-					int g = buffer.get(i + 1) & 0xFF;
-					int b = buffer.get(i + 2) & 0xFF;
-					image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-				}
-			}
-			
-			
+			BufferedImage image = GenFrame(width, height, bpp, buffer);
+
 			String fname = filename.replace(".png", "-" + currentFrame + ".png");
 			ImageIO.write(image, "PNG", new File(fname));
 			
@@ -65,8 +52,6 @@ public class AnimationPngCapture extends AnimationCapture
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
 	}
 
 }

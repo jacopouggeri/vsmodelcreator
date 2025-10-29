@@ -15,6 +15,8 @@ import org.lwjgl.opengl.GL11;
 
 import at.vintagestory.modelcreator.util.Url;
 
+import static at.vintagestory.modelcreator.util.screenshot.AnimationCapture.GenFrame;
+
 public class ScreenshotCapture
 {
 	public static void getScreenshot(int width, int height, ScreenshotCallback callback)
@@ -39,19 +41,7 @@ public class ScreenshotCapture
 		try
 		{
 			String format = "PNG";
-			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-			for (int x = 0; x < width; x++)
-			{
-				for (int y = 0; y < height; y++)
-				{
-					int i = (x + (width * y)) * bpp;
-					int r = buffer.get(i) & 0xFF;
-					int g = buffer.get(i + 1) & 0xFF;
-					int b = buffer.get(i + 2) & 0xFF;
-					image.setRGB(x, height - (y + 1), (0xFF << 24) | (r << 16) | (g << 8) | b);
-				}
-			}
+			BufferedImage image = GenFrame(width, height, bpp, buffer);
 			ImageIO.write(image, format, file);
 
 			if (callback != null)

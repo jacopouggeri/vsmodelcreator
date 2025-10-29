@@ -2,22 +2,27 @@ package at.vintagestory.modelcreator;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.Console;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
+import javax.swing.*;
 
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.newdawn.slick.opengl.PNGDecoder;
 import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureImpl;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.opengl.renderer.SGL;
 
 import at.vintagestory.modelcreator.gui.right.ElementTree;
-import at.vintagestory.modelcreator.gui.right.RightPanel;
 import at.vintagestory.modelcreator.interfaces.IDrawable;
 import at.vintagestory.modelcreator.interfaces.IElementManager;
 import at.vintagestory.modelcreator.model.*;
@@ -27,13 +32,13 @@ public class Project
 {
 	// Persistent project data
 	public boolean AmbientOcclusion;
-	public ArrayList<PendingTexture> PendingTextures = new ArrayList<PendingTexture>();
-	public LinkedHashMap<String, TextureEntry> TexturesByCode = new LinkedHashMap<String, TextureEntry>();
-	public LinkedHashMap<String, int[]> TextureSizes = new LinkedHashMap<String, int[]>();
-	public LinkedHashMap<String, String> MissingTexturesByCode = new LinkedHashMap<String, String>();
+	public ArrayList<PendingTexture> PendingTextures = new ArrayList<>();
+	public LinkedHashMap<String, TextureEntry> TexturesByCode = new LinkedHashMap<>();
+	public LinkedHashMap<String, int[]> TextureSizes = new LinkedHashMap<>();
+	public LinkedHashMap<String, String> MissingTexturesByCode = new LinkedHashMap<>();
 	
-	public ArrayList<Element> rootElements = new ArrayList<Element>();
-	public ArrayList<Animation> Animations = new ArrayList<Animation>();
+	public ArrayList<Element> rootElements = new ArrayList<>();
+	public ArrayList<Animation> Animations = new ArrayList<>();
 	
 	public int TextureWidth = 16;
 	public int TextureHeight = 16;
@@ -60,7 +65,7 @@ public class Project
 		this.filePath = filePath;
 		
 		if (ModelCreator.rightTopPanel != null) {
-			tree = ((RightPanel)ModelCreator.rightTopPanel).tree;	
+			tree = ModelCreator.rightTopPanel.tree;
 		}	
 	}
 	
@@ -230,8 +235,6 @@ public class Project
 		return SelectedAnimation.GetQuantityFrames();
 	}
 
-
-
 	public void calculateCurrentFrameElements() {
 		if (SelectedAnimation == null) return;
 		AnimationFrame keyFrame = SelectedAnimation.keyframes[SelectedAnimation.currentFrame];
@@ -240,7 +243,7 @@ public class Project
 
 	public List<IDrawable> getCurrentFrameRootElements()
 	{
-		if (SelectedAnimation == null || SelectedAnimation.keyframes.length == 0) return new ArrayList<IDrawable>(rootElements);
+		if (SelectedAnimation == null || SelectedAnimation.keyframes.length == 0) return new ArrayList<>(rootElements);
 		
 		if (SelectedAnimation.allFrames.size() == 0 || SelectedAnimation.currentFrame >= SelectedAnimation.allFrames.size()) {
 			SelectedAnimation.SetFramesDirty();
@@ -256,8 +259,6 @@ public class Project
 		
 		return SelectedAnimation.version;
 	}
-	
-	
 
 	public void addElementAsChild(Element elem)
 	{
@@ -321,8 +322,7 @@ public class Project
 		
 		ModelCreator.reloadStepparentRelationShips();
 	}
-	
-	
+
 	public void removeCurrentElement() {
 		ModelCreator.ignoreDidModify++;
 		
@@ -401,8 +401,7 @@ public class Project
 		SelectedElement = tree.getSelectedElement();
 		ModelCreator.updateValues(null);
 	}
-	
-	
+
 	void EnsureUniqueElementName(Element elem) {
 		String numberStr = "";
 		int pos = elem.getName().length() - 1;
@@ -429,7 +428,6 @@ public class Project
 		}
 	}
 
-	
 	public boolean IsElementNameUsed(String name, Element exceptElement) {
 		return IsElementNameUsed(name, rootElements, exceptElement);
 	}
@@ -446,7 +444,6 @@ public class Project
 		return false;
 	}
 
-	
 	boolean IsElementNameUsed(String name, ArrayList<Element> elems, Element exceptElement) {
 		for (Element elem : elems) {
 			if (elem == exceptElement) continue;
@@ -457,13 +454,11 @@ public class Project
 		
 		return false;
 	}
-	
-	
+
 	int TotalQuantityElements() {
 		return TotalQuantityElements(rootElements);
 	}
-	
-	
+
 	int TotalQuantityElements(ArrayList<Element> elems) {
 		int quantity = 0;
 		for (Element elem : elems) {
@@ -472,8 +467,7 @@ public class Project
 		}
 		return quantity;
 	}
-	
-	
+
 	public AttachmentPoint findAttachmentPoint(String elementName) {
 		return findAttachmentPoint(elementName, rootElements);
 	}
@@ -575,7 +569,6 @@ public class Project
 			if (elem.ChildElements != null) {
 				UpdateTextureCode(elem.ChildElements, oldCode, newCode);
 			}
-			
 		}
 	}
 
@@ -591,8 +584,6 @@ public class Project
 		
 		return entry.getTexture();
 	}
-	
-	
 
 	public String getTextureFilepathByCode(String code)
 	{
@@ -608,9 +599,7 @@ public class Project
 		if (entry == null) return null;
 		return entry.getIcon();
 	}
-	
 
-	
 	public void reloadTextures(ModelCreator creator) {
 		for (TextureEntry entry : TexturesByCode.values()) {
 			try {
@@ -619,42 +608,62 @@ public class Project
 		}
 	}
 
+	private Texture loadTexture(String texturePath, String textureRef) throws IOException {
+		Texture texture;
+
+		try (FileInputStream in = new FileInputStream(texturePath)) {
+			PNGDecoder dec = new PNGDecoder(in);
+			int w = dec.getWidth(), h = dec.getHeight();
+
+			ByteBuffer rgba = BufferUtils.createByteBuffer(w * h * 4);
+			dec.decode(rgba, w * 4, PNGDecoder.BGRA);
+			rgba.flip();
+
+			int id = GL11.glGenTextures();
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+			GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+			GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8,
+					w, h, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, rgba);
+
+			TextureImpl t = new TextureImpl(textureRef, GL11.GL_TEXTURE_2D, id);
+			t.setHeight(h); t.setWidth(w);
+			t.setTextureWidth(w); t.setTextureHeight(h);
+			t.setTextureFilter(SGL.GL_NEAREST);
+			texture = t;
+		}
+		return texture;
+	}
+
 	public void reloadExternalTexture(TextureEntry entry) throws IOException {
-		FileInputStream is = new FileInputStream(entry.getFilePath());
-		Texture texture = TextureLoader.getTexture("PNG", is);
-		is.close();
-		
-		if (texture.getImageHeight() % 8 != 0 | texture.getImageWidth() % 8 != 0)
-		{
+		if (entry.texture instanceof org.newdawn.slick.opengl.TextureImpl) {
+			int oldId = (entry.texture).getTextureID();
+			if (oldId != 0) GL11.glDeleteTextures(oldId);
+		}
+
+		Texture texture = loadTexture(entry.getFilePath(), entry.getCode());
+
+		if (texture.getImageHeight() % 8 != 0 || texture.getImageWidth() % 8 != 0) {
 			texture.release();
+			JOptionPane.showMessageDialog(null, "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")", "Error loading texture", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
-		entry.icon = upscaleIcon(new ImageIcon(entry.getFilePath()), 256);
+
 		entry.texture = texture;
+		entry.icon = upscaleIcon(new ImageIcon(entry.getFilePath()), 256);
 	}
 
 	public String loadTexture(String textureCode, File image, BooleanParam isNew, String projectType, boolean doReplaceAll, boolean doReplacedForSelectedElement, boolean insertTextureSizeEntry) throws IOException
 	{
-		BufferedImage bi;
-		Texture texture;
-		try {
-			bi = ImageIO.read(image);               // Java ARGB
-			BufferedImage bgr = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-			Graphics2D g = bgr.createGraphics();
-			g.drawImage(bi, 0, 0, null);
-			g.dispose();
-			String name = (textureCode != null ? textureCode : image.getName());
-			texture = BufferedImageUtil.getTexture(name, bgr);
-		} catch (Throwable e) {
-			return "Unable to load this texture, is this a valid PNG file?";
-		}
-		texture.setTextureFilter(SGL.GL_NEAREST);
+		Texture texture = loadTexture(image.getAbsolutePath(), (textureCode != null ? textureCode : image.getName()));
 
 		if (texture.getImageHeight() % 8 != 0 || texture.getImageWidth() % 8 != 0)
 		{
 			texture.release();
-			return "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
+			String errorMsg = "Cannot load this texture, the width or length is not a multiple of 8 ("+texture.getImageHeight()+"x"+texture.getImageWidth()+")";
+			JOptionPane.showMessageDialog(null, errorMsg, "Error loading texture", JOptionPane.ERROR_MESSAGE);
+			return errorMsg;
 		}
 
 		ImageIcon icon = upscaleIcon(new ImageIcon(image.getAbsolutePath()), 256);
@@ -681,7 +690,6 @@ public class Project
 				}	
 			}
 		}
-		
 		if (nowFoundTextures.size() == 0) {
 			
 			if (TexturesByCode.containsKey(textureCode)) {
@@ -723,8 +731,7 @@ public class Project
 				(int)(texture.getImageHeight() / ModelCreator.noTexScale)
 			});
 		}
-				
-		
+
 		if (doReplaceAll || (doReplacedForSelectedElement && SelectedElement != null)) {
 			ModelCreator.changeHistory.beginMultichangeHistoryState();
 		
@@ -928,7 +935,7 @@ public class Project
 
 	public void clearUnusedTextures()
 	{
-		HashSet<String> usedCodes = new HashSet<String>();
+		HashSet<String> usedCodes = new HashSet<>();
 		
 		for (Element elem : rootElements) {
 			elem.CollectTextureCodes(usedCodes);
@@ -936,10 +943,10 @@ public class Project
 		
 		boolean modified = false;
 		
-		for (String texCode : new HashSet<String>(TexturesByCode.keySet())) {
+		for (String texCode : new HashSet<>(TexturesByCode.keySet())) {
 			if (!usedCodes.contains(texCode)) { TexturesByCode.remove(texCode); if (!modified) ModelCreator.changeHistory.beginMultichangeHistoryState(); modified = true; }
 		}
-		for (String texCode : new HashSet<String>(TextureSizes.keySet())) {
+		for (String texCode : new HashSet<>(TextureSizes.keySet())) {
 			if (!usedCodes.contains(texCode)) { TextureSizes.remove(texCode); if (!modified) ModelCreator.changeHistory.beginMultichangeHistoryState(); modified = true; }	
 		}
 		

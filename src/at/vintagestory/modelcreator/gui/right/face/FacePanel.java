@@ -58,12 +58,11 @@ public class FacePanel extends JPanel implements IValueUpdater
 			(int)(Face.ColorsByFace[face].getGreen() * Element.DefaultBlockSideBrightnessByFacing[face]) + "," +
 			(int)(Face.ColorsByFace[face].getBlue() * Element.DefaultBlockSideBrightnessByFacing[face])
 		;
-				
 	}
 	
 	public void initMenu()
 	{
-		model = new DefaultComboBoxModel<String>();
+		model = new DefaultComboBoxModel<>();
 		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(0) + ");'><b>North</b></html>");
 		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(1) + ");'><b>East</b></html>");
 		model.addElement("<html><div style='padding:5px;color:rgb(" + FaceColor(2) + ");'><b>South</b></html>");
@@ -111,8 +110,6 @@ public class FacePanel extends JPanel implements IValueUpdater
 		rotation.setPaintTicks(true);
 		rotation.setPaintLabels(true);
 		rotation.setLabelTable(labelTable);
-		
-		
 		rotation.addChangeListener(e ->
 		{
 			if (ModelCreator.ignoreValueUpdates) return;

@@ -709,7 +709,8 @@ public class GuiMenu extends JMenuBar
 			ModelCreator.darkMode = itemDarkMode.isSelected();
 			ModelCreator.prefs.putBoolean("darkMode", ModelCreator.darkMode);
 		});
-		
+		ModelCreator.setDarkMode(ModelCreator.darkMode);
+
 		itemSaratyMode.addActionListener(a -> {
 			ModelCreator.saratyMode = itemSaratyMode.isSelected();
 			ModelCreator.prefs.putBoolean("uvRotateRename", ModelCreator.saratyMode);
@@ -809,7 +810,6 @@ public class GuiMenu extends JMenuBar
 			elem.RandomizeTexture(true);
 			ModelCreator.changeHistory.endMultichangeHistoryState(ModelCreator.currentProject);
 		});
-
 		
 		itemReloadTextures.addActionListener(a -> ModelCreator.currentProject.reloadTextures(creator));
 		
